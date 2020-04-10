@@ -2,6 +2,7 @@
 Wiring, software libraries, and example code of various common hardware used to create internet-enabled Arduino devices
 
 
+
 | Image | Chipset  | Type | Code  | Purchase |
 | -------------- | ------------- | ------------- | ------------- | ------------- | ------------- | ------------- |
 | ![](Images/W5100.jpg) | W5100 | Wired | https://github.com/arduino-libraries/Ethernet (built-in) | https://www.banggood.com/custlink/GK3GMBRWgl |
