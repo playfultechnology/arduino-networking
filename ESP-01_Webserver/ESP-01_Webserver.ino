@@ -22,7 +22,7 @@ const char ssid[] = "VodafoneConnect53686628";
 // Password required to join network
 const char password[] = "8p2ty6329x2mk6v";
 // Port on which server will listen to requests
-const uint16_t port = 8081;
+const uint16_t port = 80;
 
 // GLOBALS
 // Use a ring buffer to store the HTTP request
@@ -47,6 +47,8 @@ RingBuffer buf(16);
 // out the parts we are interested in.
 // The server object, and the port on which to start the server listening
 WiFiEspServer server(80);
+// We don't strictly *need* a client object to simply respond to incoming requests, but we'll
+// use it to create an outoing request to the ident.me page to determine our WAN address
 WiFiEspClient client;
 
 void setup() {
@@ -65,9 +67,9 @@ void setup() {
   }
 
   // Print config to serial monitor
-  Serial.print("SSID: ");
+  Serial.print(F("SSID: "));
   Serial.println(ssid);
-  Serial.print("LAN IP: ");
+  Serial.print(F("LAN IP: "));
   Serial.println(WiFi.localIP());
   
   // Retrieve our WAN address from the ident.me service
@@ -79,23 +81,20 @@ void setup() {
   int httpCode = httpClient.responseStatusCode();
   if(httpCode > 0) {
     String response = httpClient.responseBody();
-    Serial.print("WAN IP: ");
+    Serial.print(F("WAN IP: "));
     Serial.println(response);
   }
-  
-  // Start the web server on port 80
+  // Start the web server
   server.begin();
-
   // Wait a little for server to initialise before starting main program loop
   delay(2000);
 }
-
 
 void loop() {
   // Listen for incoming clients
   WiFiEspClient client = server.available();
   if (client) {
-    Serial.println("New client connected");
+    Serial.println(F("New client connected"));
     // Initialise the buffer
     buf.init();
     // If the client is connected
@@ -110,16 +109,19 @@ void loop() {
         buf.push(c);
         // Check to see if the client request was "GET /H" or "GET /L":
         if (buf.endsWith("GET /H")) {
-          Serial.println("Turn led ON");
-          digitalWrite(LED_BUILTIN, HIGH);
+          Serial.println(F(" - Turning LED on"));
+          digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
         }
         else if (buf.endsWith("GET /L")) {
-          Serial.println("Turn led OFF");
-          digitalWrite(LED_BUILTIN, LOW);
+          Serial.println((" - Turning LED off"));
+          digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+        }
+        else if (buf.endsWith("GET /?p=1234")) {
+          Serial.println((" - CORRECT PASSWORD ENTERED!"));
         }
         // Two newline characters in a row indicates the end of the HTTP request
         else if (buf.endsWith("\r\n\r\n")) {
-          Serial.println("Sending response to GET request");
+          Serial.println(F("Sending response"));
           // Send a HTTP response header
           // Use \r\n instead of println statements increases speed
           client.print(F("HTTP/1.1 200 OK\r\n"));
@@ -127,15 +129,15 @@ void loop() {
           client.print(F("Connection: close\r\n\r\n"));
           // Now send the content of the webpage
           client.print(F("<!DOCTYPE HTML>\r\n"));
-          client.print("<html>\r\n");
-          client.print("<h1>Escape Room Controller</h1>\r\n");
+          client.print(F("<html>\r\n"));
+          client.print(F("<h1>Escape Room Controller</h1>\r\n"));
           /*
            * If desired, you could display readings on the webpage , like this 
            * client.print(analogRead(A0));
            */         
           client.print(F("<form action='/' method='GET'>"));
-          client.print(F("Password: <input type='text' name='name' value='' size='4' maxlength='4'>"));
-          client.print(F("<input type='submit' name='submit'>"));
+          client.print(F("Password: <input type='text' name='p' value='' size='4' maxlength='4'>"));
+          client.print(F("<input type='submit' value='submit'>"));
           client.print(F("</form>"));
           client.print(F("Click <a href=\"/H\">here</a> turn the LED on<br>"));
           client.print(F("Click <a href=\"/L\">here</a> turn the LED off<br>"));
@@ -144,12 +146,10 @@ void loop() {
         }
       }
     }
-
-    // give the web browser time to receive the data
+    // Give the web browser time to receive the data
     delay(10);
-
-    // close the connection:
+    // Close the connection:
     client.stop();
-    Serial.println("Client disconnected");
+    Serial.println(F("Client disconnected"));
   }
 }
