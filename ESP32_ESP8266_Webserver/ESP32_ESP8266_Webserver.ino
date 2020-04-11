@@ -40,7 +40,7 @@ void handleRoot() {
     // Display the submitted value on the serial monitor
     Serial.println(server.arg("value").c_str());
   }
-  server.send(200, "text/html", "<form action='/' method='POST'><input type='text' name='value'><input type='submit' value='Submit'/></form>");
+  server.send(200, "text/html", "<h1>Escape Room Controller</h1>\r\n form action='/' method='GET'>Password: <input type='text' name='name' value='' size='4' maxlength='4'><input type='submit' name='submit'></form>Click <a href=\"/H\">here</a> turn the LED on<br>Click <a href=\"/L\">here</a> turn the LED off");
 }
 void handleNotFound() {
   server.send(404, "text/plain", "Not found");

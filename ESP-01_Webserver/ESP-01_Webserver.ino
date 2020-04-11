@@ -5,10 +5,11 @@
 */
 
 // INCLUDES
+// "WiFiEsp" from Arduino IDE Library Manager
 #include "WiFiEsp.h"
-// Install the "Arduino HTTP Client" from Manage Libraries
+// Arduino HTTP Client" from Arduino IDE Library Manager
 #include <ArduinoHttpClient.h>
-// If running on a device that only has one hardware serial connection )i.e. UNO/Nano), 
+// If running on a device that only has one hardware serial connection (i.e. UNO/Nano), 
 // emulate a secondary one using software emulation.
 #ifndef HAVE_HWSERIAL1
   #include "SoftwareSerial.h"
@@ -24,12 +25,6 @@ const char password[] = "8p2ty6329x2mk6v";
 const uint16_t port = 8081;
 
 // GLOBALS
-// The type of HTTP request received (GET/POST)
-enum Method { Undefined, GET, POST };
-Method method = Method::Undefined;
-// Keep track of the part of the request being processed
-enum MessagePart { Header, Body, PostContent };
-MessagePart messagePart = MessagePart::Header;
 // Use a ring buffer to store the HTTP request
 RingBuffer buf(16);
 // This buffer will store the last x characters of the HTTP request in a rolling ring buffer.
@@ -53,7 +48,6 @@ RingBuffer buf(16);
 // The server object, and the port on which to start the server listening
 WiFiEspServer server(80);
 WiFiEspClient client;
-int reqCount = 0;                // number of requests received
 
 void setup() {
   // Initialize serial for debugging
@@ -92,25 +86,19 @@ void setup() {
   // Start the web server on port 80
   server.begin();
 
+  // Wait a little for server to initialise before starting main program loop
   delay(2000);
 }
 
 
 void loop() {
-  // listen for incoming clients
+  // Listen for incoming clients
   WiFiEspClient client = server.available();
   if (client) {
     Serial.println("New client connected");
+    // Initialise the buffer
     buf.init();
-
-    // Initialise the variables we know about this connection
-    method = Method::Undefined;
-    messagePart = MessagePart::Header;
-    int messageLength;
-
-    // https://stackoverflow.com/questions/14944773/receiving-a-http-post-request-on-arduino
-    // an http request ends with a blank line
-    bool currentLineIsBlank = true;
+    // If the client is connected
     while (client.connected()) {
       // There's some data to process
       if (client.available()) {
@@ -120,120 +108,43 @@ void loop() {
         Serial.write(c);
         // Add it on to the ring buffer
         buf.push(c);
-
-        // Scan the contents of the ring buffer to identify the request method
-        if(method == Method::Undefined) {
-          if (buf.endsWith("GET /")) {
-            method = Method::GET;
-          }
-          else if(buf.endsWith("POST /")) {
-            method = Method::POST;
-          }
+        // Check to see if the client request was "GET /H" or "GET /L":
+        if (buf.endsWith("GET /H")) {
+          Serial.println("Turn led ON");
+          digitalWrite(LED_BUILTIN, HIGH);
         }
-
-        // If we're dealing with a GET request
-        if(method == Method::GET) {
-          // Check to see if the client request was "GET /H" or "GET /L":
-          if (buf.endsWith("GET /H")) {
-            Serial.println("Turn led ON");
-            digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-          }
-          else if (buf.endsWith("GET /L")) {
-            Serial.println("Turn led OFF");
-            digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-          }
-          // you got two newline characters in a row
-          // that's the end of the HTTP request, so send a response
-          else if (buf.endsWith("\r\n\r\n")) {
-            Serial.println("Sending response to GET request");
-            // send a standard http response header
-            // use \r\n instead of many println statements to speedup data send
-            client.print(F("HTTP/1.1 200 OK\r\n"));
-            client.print(F("Content-type:text/html\r\n"));
-            client.print(F("Connection: close\r\n"));
-            client.println();
-            client.print("<!DOCTYPE HTML>\r\n");
-            client.print("<html>\r\n");
-            client.print("<h1>Hello World!</h1>\r\n");
-            client.print("Requests received: ");
-            client.print(++reqCount);
-            client.print("<br>\r\n");
-            client.print("Analog input A0: ");
-            client.print(analogRead(0));
-            client.print("<br>\r\n");
-            //form added to send data from browser and view received data in serial monitor         
-            client.println("<FORM ACTION=\"/\" METHOD=\"POST\">");
-            client.println("Name: <INPUT TYPE=\"TEXT\" NAME=\"Name\" VALUE=\"\" SIZE=\"25\" MAXLENGTH=\"50\"><BR>");
-            client.println("Email: <INPUT TYPE=\"TEXT\" NAME=\"Email\" VALUE=\"\" SIZE=\"25\" MAXLENGTH=\"50\"><BR>");
-            client.println("<INPUT TYPE=\"SUBMIT\" NAME=\"submit\" VALUE=\"Sign Me Up!\">");
-            client.println("</FORM>");
-            client.println("Click <a href=\"/H\">here</a> turn the LED on<br>");
-            client.println("Click <a href=\"/L\">here</a> turn the LED off<br>");
-            client.print("</html>\r\n");
-            break;
-          }
+        else if (buf.endsWith("GET /L")) {
+          Serial.println("Turn led OFF");
+          digitalWrite(LED_BUILTIN, LOW);
         }
-
-        // If we're dealing with a POST request
-        else if(method==Method::POST) {
-
-          // Scan the ring buffer to find out how long the message body is
-          if (messagePart == MessagePart::Header && buf.endsWith("Content-Length: ")) {
-            // Retrieve the next characters from the request to get the value of the content length
-            char contentLength[8];
-            for(int c=0; c<7; c++) {
-              char n = client.read();
-              buf.push(n);
-              if(n=='\r') { break; }
-              contentLength[c] = n;
-              contentLength[c+1] = 0;
-            }
-            // Convert to an int
-            messageLength = atoi(contentLength);
-            Serial.print("messageLength:");
-            Serial.println(messageLength);
-          }
-          // If we've got to the end of the header
-          if (messagePart == MessagePart::Header && buf.endsWith("\r\n\r\n")) {
-            messagePart = MessagePart::Body;
-          }
-          // If we're in the message body itself
-          else if(messagePart == MessagePart::Body) {
-            // Read the known number of characters in the message body
-            for(int c=0; c<messageLength; c++) {
-              char n = client.read();
-              Serial.print(n);
-              buf.push(n);
-            }
-            Serial.println("Sending response to POST request");
-            client.print(F("HTTP/1.1 200 OK\r\n"));
-            client.print(F("Content-type:text/html\r\n"));
-            client.print(F("Connection: close\r\n"));
-            client.println();
-            client.print("<!DOCTYPE HTML>\r\n");
-            client.print("<html>\r\n");
-            client.print("<h1>Hello World!</h1>\r\n");
-            client.print("Requests received: ");
-            client.print(++reqCount);
-            client.print("<br>\r\n");
-            client.print("Analog input A0: ");
-            client.print(analogRead(0));
-            client.print("<br>\r\n");
-            //form added to send data from browser and view received data in serial monitor         
-            client.println("<FORM ACTION=\"/\" METHOD=\"POST\">");
-            client.println("Name: <INPUT TYPE=\"TEXT\" NAME=\"Name\" VALUE=\"\" SIZE=\"25\" MAXLENGTH=\"50\"><BR>");
-            client.println("Email: <INPUT TYPE=\"TEXT\" NAME=\"Email\" VALUE=\"\" SIZE=\"25\" MAXLENGTH=\"50\"><BR>");
-            client.println("<INPUT TYPE=\"SUBMIT\" NAME=\"submit\" VALUE=\"Sign Me Up!\">");
-            client.println("</FORM>");
-            client.println("Click <a href=\"/H\">here</a> turn the LED on<br>");
-            client.println("Click <a href=\"/L\">here</a> turn the LED off<br>");
-            client.print("</html>\r\n");
-            break;
-          }
+        // Two newline characters in a row indicates the end of the HTTP request
+        else if (buf.endsWith("\r\n\r\n")) {
+          Serial.println("Sending response to GET request");
+          // Send a HTTP response header
+          // Use \r\n instead of println statements increases speed
+          client.print(F("HTTP/1.1 200 OK\r\n"));
+          client.print(F("Content-type:text/html\r\n"));
+          client.print(F("Connection: close\r\n\r\n"));
+          // Now send the content of the webpage
+          client.print(F("<!DOCTYPE HTML>\r\n"));
+          client.print("<html>\r\n");
+          client.print("<h1>Escape Room Controller</h1>\r\n");
+          /*
+           * If desired, you could display readings on the webpage , like this 
+           * client.print(analogRead(A0));
+           */         
+          client.print(F("<form action='/' method='GET'>"));
+          client.print(F("Password: <input type='text' name='name' value='' size='4' maxlength='4'>"));
+          client.print(F("<input type='submit' name='submit'>"));
+          client.print(F("</form>"));
+          client.print(F("Click <a href=\"/H\">here</a> turn the LED on<br>"));
+          client.print(F("Click <a href=\"/L\">here</a> turn the LED off<br>"));
+          client.print(F("</html>"));
+          break;
         }
       }
     }
-    
+
     // give the web browser time to receive the data
     delay(10);
 
