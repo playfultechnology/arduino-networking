@@ -1,14 +1,7 @@
 /*
- WiFiEsp example: WebServer
-
- A simple web server that shows the value of the analog input 
- pins via a web page using an ESP8266 module.
- This sketch will print the IP address of your ESP8266 module (once connected)
- to the Serial monitor. From there, you can open that address in a web browser
- to display the web page.
- The web page will be automatically refreshed each 20 seconds.
-
- For more details see: http://yaab-arduino.blogspot.com/p/wifiesp.html
+ * ESP-01 WebServer
+ * Demonstrates how to create functionality that can be controlled over the internet
+ * via an exposed web interface
 */
 
 // INCLUDES
@@ -23,8 +16,12 @@
 #endif
 
 // CONSTANTS
-const char ssid[] = "VodafoneConnect53686628";            // your network SSID (name)
-const char password[] = "8p2ty6329x2mk6v";        // your network password
+// The SSID of the Wi-Fi network to join
+const char ssid[] = "VodafoneConnect53686628";
+// Password required to join network
+const char password[] = "8p2ty6329x2mk6v";
+// Port on which server will listen to requests
+const uint16_t port = 8081;
 
 // GLOBALS
 // The type of HTTP request received (GET/POST)
@@ -56,7 +53,6 @@ RingBuffer buf(16);
 // The server object, and the port on which to start the server listening
 WiFiEspServer server(80);
 WiFiEspClient client;
-int status = WL_IDLE_STATUS;     // the Wifi radio's status
 int reqCount = 0;                // number of requests received
 
 void setup() {
@@ -74,32 +70,33 @@ void setup() {
     Serial.print(".");
   }
 
+  // Print config to serial monitor
   Serial.print("SSID: ");
   Serial.println(ssid);
   Serial.print("LAN IP: ");
   Serial.println(WiFi.localIP());
+  
   // Retrieve our WAN address from the ident.me service
   HttpClient httpClient = HttpClient(client, "176.58.123.25", 80);
   httpClient.beginRequest();
   httpClient.get("/");
   httpClient.endRequest();
-
-  // read the status code and body of the response
-  int statusCode = httpClient.responseStatusCode();
-  String response = httpClient.responseBody();
-
-  if(statusCode > 0) {
+  // Read the status code and body of the response
+  int httpCode = httpClient.responseStatusCode();
+  if(httpCode > 0) {
+    String response = httpClient.responseBody();
     Serial.print("WAN IP: ");
     Serial.println(response);
   }
   
-  // start the web server on port 80
+  // Start the web server on port 80
   server.begin();
+
+  delay(2000);
 }
 
 
-void loop()
-{
+void loop() {
   // listen for incoming clients
   WiFiEspClient client = server.available();
   if (client) {
