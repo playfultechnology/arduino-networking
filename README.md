@@ -6,7 +6,7 @@ During the current Covid-19 Coronavirus pandemic, many escape rooms owners have 
 One solution to this is to expose functionality of Arduino-powered props over a public web interface, allowing players to log-in via their browsers and release maglocks, turn on displays, or activate other electronic elements in the room environment. To do this, I'm going to do a bit of a roundup of the various choices of hardware and software that enable you to do that.
 
 | Image | Chipset  | Type | Interface | Library  | Purchase |
-| -------------- | ------------- | ------------- | ------------- | ------------- |
+| ----- | -------- | ---- | --------- | -------- | -------- |
 | ![](Images/W5100.jpg) | W5100 | Wired ethernet shield for Arduino UNO | SPI | https://github.com/arduino-libraries/Ethernet (supplied with Arduino IDE) | https://www.banggood.com/custlink/GK3GMBRWgl |
 | ![](Images/ENC28J60.jpg) | ENC28J60 | Wired ethernet module | SPI | https://github.com/UIPEthernet/UIPEthernet | https://www.banggood.com/custlink/DDK3q4yC8a |
 | ![](Images/ESP01.jpg) | ESP-01 (ESP8266) | Wi-Fi | Serial | https://github.com/willdurand/EspWiFi | https://www.banggood.com/custlink/GvGKqBRJeP |
