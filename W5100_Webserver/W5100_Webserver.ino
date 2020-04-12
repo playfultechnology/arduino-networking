@@ -1,25 +1,25 @@
 /*
- * ENC28J60 WebServer
+ * W5100 WebServer
  *
  * Demonstrates how to create functionality that can be controlled over the internet
  * via an exposed web interface
 */
 
 // INCLUDES
-// "UIP Ethernet" from Arduino IDE Library Manager
-#include <UIPEthernet.h>
+// "Ethernet" library included with Arduino IDE
+#include <Ethernet.h>
 #include "Ringbuffer.h"
 
 // CONSTANTS
-const byte mac[6] = {0xba, 0xba, 0xba, 0xba, 0xba, 0xba};
-const IPAddress ip(192, 168, 1, 40);
+const byte mac[6] = {0xab, 0xcd, 0xef, 0x00, 0x00, 0x00};
+const IPAddress ip(192, 168, 1, 41);
 const uint16_t port = 80;
 
 // GLOBALS
 // Use a ring buffer to store rolling 8 chars of HTTP request
 RingBuffer buf(16);
 // The server object, and the port on which to start the server listening
-EthernetServer server = EthernetServer(port);
+EthernetServer server(port);
 
 void setup() {
   // Initialize serial for debugging
