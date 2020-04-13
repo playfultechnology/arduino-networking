@@ -22,7 +22,9 @@ const char ssid[] = "VodafoneConnect53686628";
 // Password required to join network
 const char password[] = "8p2ty6329x2mk6v";
 // Port on which server will listen to requests
-const uint16_t port = 80;
+const uint16_t port = 2002;
+// This pin will be driven HIGH by the user's browser
+const byte relayPin = 7;
 
 // GLOBALS
 // Use a ring buffer to store the HTTP request
@@ -86,6 +88,9 @@ void setup() {
   }
   // Start the web server
   server.begin();
+  // Initialise the relay pin
+  pinMode(relayPin, OUTPUT);
+  digitalWrite(relayPin, LOW);
   // Wait a little for server to initialise before starting main program loop
   delay(2000);
 }
@@ -107,16 +112,19 @@ void loop() {
         Serial.write(c);
         // Add it on to the ring buffer
         buf.push(c);
-        // Check to see if the client request was "GET /H" or "GET /L":
+        // Check what the user's browser was requesting
         if (buf.endsWith("GET /H")) {
-          Serial.println(F(" - Turning LED on"));
-          digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+          Serial.println(F(" - Activating relay"));
+          digitalWrite(relayPin, HIGH);
         }
         else if (buf.endsWith("GET /L")) {
-          Serial.println((" - Turning LED off"));
-          digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+          Serial.println((" - Activating relay"));
+          digitalWrite(relayPin, LOW);
         }
         else if (buf.endsWith("GET /?p=1234")) {
+          digitalWrite(relayPin, HIGH);
+          delay(500);
+          digitalWrite(relayPin, LOW);
           Serial.println((" - CORRECT PASSWORD ENTERED!"));
         }
         // Two newline characters in a row indicates the end of the HTTP request

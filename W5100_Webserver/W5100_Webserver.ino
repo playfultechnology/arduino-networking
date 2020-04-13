@@ -11,9 +11,11 @@
 #include "Ringbuffer.h"
 
 // CONSTANTS
-const byte mac[6] = {0xab, 0xcd, 0xef, 0x00, 0x00, 0x00};
+const byte mac[6] = {0xab, 0xcd, 0xef, 0x00, 0x00, 0x01};
 const IPAddress ip(192, 168, 1, 41);
-const uint16_t port = 80;
+const uint16_t port = 2001;
+// This pin will be driven HIGH from the user's browser input
+const byte relayPin = 7;
 
 // GLOBALS
 // Use a ring buffer to store rolling 8 chars of HTTP request
@@ -31,6 +33,9 @@ void setup() {
   Serial.println(Ethernet.localIP());
   // Start the server
   server.begin();
+  // Initialise the output pin
+  pinMode(relayPin, OUTPUT);
+  digitalWrite(relayPin, LOW);
   // Wait a little for server to initialise before starting main program loop
   delay(2000);
 }
@@ -50,14 +55,17 @@ void loop() {
         // Add it on to the ring buffer
         buf.push(c);
         if (buf.endsWith("GET /H")) {
-          Serial.println(F(" - Turning LED on"));
-          digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+          Serial.println(F(" - Activating relay"));
+          digitalWrite(relayPin, HIGH);
         }
         else if (buf.endsWith("GET /L")) {
-          Serial.println((" - Turning LED off"));
-          digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+          Serial.println((" - Activating relay"));
+          digitalWrite(relayPin, LOW);
         }
         else if (buf.endsWith("GET /?p=1234")) {
+          digitalWrite(relayPin, HIGH);
+          delay(500);
+          digitalWrite(relayPin, LOW);
           Serial.println((" - CORRECT PASSWORD ENTERED!"));
         }
         // you got two newline characters in a row
