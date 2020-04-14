@@ -11,4 +11,4 @@ One solution to this is to expose functionality of Arduino-powered props over a 
 | ![](Images/ENC28J60.jpg) | ENC28J60 | Wired | SPI | https://github.com/UIPEthernet/UIPEthernet | https://www.banggood.com/custlink/DDK3q4yC8a |
 | ![](Images/ESP01.jpg) | ESP-01 (ESP8266) | Wi-Fi | Serial | https://github.com/willdurand/EspWiFi | https://www.banggood.com/custlink/GvGKqBRJeP |
 | ![](Images/ESP8266.jpg) | ESP8266 | Wi-Fi standalone | Standalone | https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi (supplied with ESP8266 platform library) | https://www.banggood.com/custlink/GvGKqBRJeP |
-| ![](Images/ESP32.jpg) | ESP32 | Wi-Fi standalone | Standalone | https://github.com/espressif/arduino-esp32/tree/master/libraries/WiFi (supplied with ESP32 platform library) | https://www.banggood.com/custlink/GvGKqBRJeP |
+| ![](Images/ESP32.jpg) | ESP32 | Wi-Fi standalone | Standalone | https://github.com/espressif/arduino-esp32/tree/master/libraries/WiFi (supplied with ESP32 platform library) | https://www.banggood.com/custlink/GvmKq6b0Rt |
