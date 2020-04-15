@@ -22,7 +22,7 @@ const char ssid[] = "VodafoneConnect53686628";
 // Password required to join network
 const char password[] = "8p2ty6329x2mk6v";
 // Port on which server will listen to requests
-const uint16_t port = 2002;
+const uint16_t port = 2004;
 // This pin will be driven HIGH by the user's browser
 const byte relayPin = 7;
 
@@ -48,7 +48,7 @@ RingBuffer buf(16);
 // We can ignore the rest, so we'll just stream the response through a ring buffer only picking
 // out the parts we are interested in.
 // The server object, and the port on which to start the server listening
-WiFiEspServer server(80);
+WiFiEspServer server(port);
 // We don't strictly *need* a client object to simply respond to incoming requests, but we'll
 // use it to create an outoing request to the ident.me page to determine our WAN address
 WiFiEspClient client;
