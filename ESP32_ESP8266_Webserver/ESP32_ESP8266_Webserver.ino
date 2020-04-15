@@ -24,7 +24,7 @@ const char ssid[] = "VodafoneConnect53686628";
 // Password required to join network
 const char password[] = "8p2ty6329x2mk6v";
 // Port on which server will listen to requests
-const uint16_t port = 2003;
+const uint16_t port = 2002;
 const byte relayPin = 7;
 
 // GLOBALS
@@ -37,7 +37,7 @@ const byte relayPin = 7;
 
 // CALLBACKS
 void displayPage() {
-  server.send(200, "text/html", "<h1>Escape Room Controller</h1>\r\n form action='/' method='GET'>Password: <input type='text' name='name' value='' size='4' maxlength='4'><input type='submit' name='submit'></form>Click <a href=\"/H\">here</a> turn the LED on<br>Click <a href=\"/L\">here</a> turn the LED off");
+  server.send(200, "text/html", "<h1>Escape Room Controller</h1><form action='/' method='GET'>Password: <input type='text' name='p' value='' size='4' maxlength='4'><input type='submit'></form>Click <a href=\"/H\">here</a> turn the LED on<br>Click <a href=\"/L\">here</a> turn the LED off");
 }
 void handleNotFound() {
   server.send(404, "text/plain", "Not found");
@@ -57,10 +57,12 @@ void setup() {
   }
 
   // Print config to serial monitor
-  Serial.print("SSID: ");
+  Serial.print(F("SSID: "));
   Serial.println(ssid);
-  Serial.print("LAN IP: ");
+  Serial.print(F("LAN IP: "));
   Serial.println(WiFi.localIP());
+  Serial.print(F("MAC: "));
+  Serial.println(WiFi.macAddress());
 
   // Retrieve our WAN address from the ident.me service
   HTTPClient http;
@@ -68,7 +70,7 @@ void setup() {
   int httpCode = http.GET();
   if(httpCode > 0) {
     String response = http.getString();
-    Serial.print("WAN IP: ");
+    Serial.print(F("WAN IP: "));
     Serial.println(response);    
   }
   // Free up resources  
@@ -76,7 +78,7 @@ void setup() {
 
   // Define the different resources which the user can request
   server.on("/", []() {
-    if(server.hasArg("p") && server.arg("p") == 1234) {
+    if(server.hasArg("p") && server.arg("p") == "1234") {
       digitalWrite(relayPin, HIGH);
       delay(500);
       digitalWrite(relayPin, LOW);
@@ -90,14 +92,14 @@ void setup() {
     displayPage();
   });
   server.on("/L", [](){
-    Serial.println((" - Activating relay"));
+    Serial.println(F(" - Activating relay"));
     digitalWrite(relayPin, LOW);
     displayPage();
   });
   server.onNotFound(handleNotFound);
   // Start the server
   server.begin();
-  Serial.println("HTTP server started");
+  Serial.println(F("HTTP server started"));
 
   delay(2000);
 }
