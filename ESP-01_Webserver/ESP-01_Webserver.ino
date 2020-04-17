@@ -18,9 +18,9 @@
 
 // CONSTANTS
 // The SSID of the Wi-Fi network to join
-const char ssid[] = "VodafoneConnect53686628";
+const char ssid[] = "INSERTYOURWIFISSIDHERE";
 // Password required to join network
-const char password[] = "8p2ty6329x2mk6v";
+const char password[] = "INSERTYOURWIFIPASSWORDHERE";
 // Port on which server will listen to requests
 const uint16_t port = 2004;
 // This pin will be driven HIGH by the user's browser
