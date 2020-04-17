@@ -138,6 +138,7 @@ void loop() {
           // Now send the content of the webpage
           client.print(F("<!DOCTYPE HTML>\r\n"));
           client.print(F("<html>\r\n"));
+          client.println(F("<link rel='stylesheet' type='text/css' href='http://playful.technology/projects/coronadyne/style.css' />"));
           client.print(F("<h1>Escape Room Controller</h1>\r\n"));
           /*
            * If desired, you could display readings on the webpage , like this 
@@ -149,6 +150,7 @@ void loop() {
           client.print(F("</form>"));
           client.print(F("Click <a href=\"/H\">here</a> turn the LED on<br>"));
           client.print(F("Click <a href=\"/L\">here</a> turn the LED off<br>"));
+          client.println(F("<a class='button button-off'href='/led2off'>OFF</a>"));
           client.print(F("</html>"));
           break;
         }
