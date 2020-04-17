@@ -8,6 +8,7 @@ One solution to this is to expose functionality of Arduino-powered props over a 
 | Image | Chipset  | Type | Interface | Library  | Purchase |
 | ----- | -------- | ---- | --------- | -------- | -------- |
 | ![](Images/W5100.jpg) | W5100 | Wired | SPI | https://github.com/arduino-libraries/Ethernet (supplied with Arduino IDE) | https://www.banggood.com/custlink/GK3GMBRWgl |
+| ![](Images/W5500.jpg) | W5500 | Wired | SPI |  https://github.com/arduino-libraries/Ethernet (supplied with Arduino IDE) | https://www.banggood.com/custlink/DvGD2QW3Cm |
 | ![](Images/ENC28J60.jpg) | ENC28J60 | Wired | SPI | https://github.com/UIPEthernet/UIPEthernet | https://www.banggood.com/custlink/DDK3q4yC8a |
 | ![](Images/ESP01.jpg) | ESP-01 (ESP8266) | Wi-Fi | Serial | https://github.com/willdurand/EspWiFi | https://www.banggood.com/custlink/GvGKqBRJeP |
 | ![](Images/ESP8266.jpg) | ESP8266 | Wi-Fi standalone | Standalone | https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi (supplied with ESP8266 platform library) | https://www.banggood.com/custlink/KGvGM4kTLM |
