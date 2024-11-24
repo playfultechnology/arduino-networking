@@ -1,9 +1,7 @@
 # arduino-networking
 Wiring, software libraries, and example code of various common hardware used to create internet-enabled Arduino devices
 
-During the current Covid-19 Coronavirus pandemic, many escape rooms owners have diversified into creating online/remote escape room experiences - in which a team of players guide a remote host, equipped with a Go-Pro camera, to solve puzzles in the room based on the player's commands. This approach gives me fond memories of the TV show Knightmare, but since all players' actions are mediated through a third person, it loses an element of the direct interaction that players normally experience.
-
-One solution to this is to expose functionality of Arduino-powered props over a public web interface, allowing players to log-in via their browsers and release maglocks, turn on displays, or activate other electronic elements in the room environment. This repository is intended to provide a summary of the various choices of hardware and software that enable you to do that.
+# Ethernet
 
 | Image | Chipset  | Type | Interface | Library  | Purchase |
 | ----- | -------- | ---- | --------- | -------- | -------- |
@@ -14,5 +12,30 @@ One solution to this is to expose functionality of Arduino-powered props over a 
 | ![](Images/ESP8266.jpg) | ESP8266 | Wi-Fi standalone | Standalone | https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi (supplied with ESP8266 platform library) | https://www.banggood.com/custlink/KGvGM4kTLM |
 | ![](Images/ESP32.jpg) | ESP32 | Wi-Fi standalone | Standalone | https://github.com/espressif/arduino-esp32/tree/master/libraries/WiFi (supplied with ESP32 platform library) | https://www.banggood.com/custlink/GvmKq6b0Rt |
 
-# Wiring
 ![](Wiring/Arduino-Networking_bb.jpg)
+
+# RS485
+The MAX485 chip only operates at 5V logic. 
+Many common TTL-to-R485 convertors therefore also only operate with 5V logic. 
+| Image | Notes  |
+| ----- | -------- |
+| <img src="Images/MAX485_module.jpg" height=100/> | MAX485 5V only! |
+
+The MAX13487 has auto-direction control, which means less pins, but still only operates with 5V logic.
+| Image | Notes  |
+| ----- | -------- |
+| <img src="Images/MAX13487_module.jpg" height=100/> | MAX13487 5V only! |
+
+The MAX3485 (or SP3485, etc.) operate at 3.3V 
+| Image | Notes  |
+| ----- | -------- |
+| <img src="Images/MAX3485_module.jpg" height=100/> | MAX3485 3.3V/5V |
+
+Barest implementation of a 3485 is https://www.aliexpress.com/item/1005006864113609.html
+
+This board is nice, as it seems
+120-ohm matching resistor that can be easily connected by shorting R0. 
+ ESD protection and TVS overvoltage protection
+ castellated edge pads
+
+Other varieties exist, e.g.: https://www.aliexpress.com/item/1005006243340333.html
